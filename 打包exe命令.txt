@@ -1,0 +1,76 @@
+https://blog.csdn.net/ik666/article/details/127507856
+
+“-F”效果是打包成一个文件
+
+“-w”则可以使打包后的程序运行时不弹出黑窗口
+
+“-i”后跟一个ico格式（其他格式会报错）的图标，则可以指定打包后程序的图标
+
+“main.py”是你要打包程序的入口文件（其他被调用的文件会自动导入）
+
+pyi-makespec -F -w -i packTool.ico main.py 
+
+同目录下生成main.spec文件
+
+接下来我们解析“datas=[]”，此列表内可以加入一个元组（注意，此元组最多可以有两个元素）指定要打包的资源和打包后在临时文件夹内的文件夹名称。
+比如“datas=[(‘bin’,‘.’)]”第一个bin代表需要打包的文件夹名bin，其内部存放的全都是各种资源文件。
+第二个’.‘代表打包后在临时文件中的文件夹名称。因为我的程序资源原本是存放在main.py的同级目录的，
+所有这里不需要运行后将资源释放到指定的文件夹中，直接使用’.'即可。如本身被调用的资源就在一个二级文件夹“bin”里，
+则修改为“datas=[(‘bin’,‘bin’)]”。
+
+main.spec:
+
+# -*- mode: python ; coding: utf-8 -*-
+
+
+block_cipher = None
+
+
+a = Analysis(
+    ['main.py'],
+    pathex=[],
+    binaries=[],
+    datas=[('bin','bin')],
+    hiddenimports=[],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name='main',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+
+
+)
+
+最后执行: pyinstaller main.spec 生成exe文件
+
+
+
+
+
+
